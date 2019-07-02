@@ -44,37 +44,37 @@ public class AppUser implements UserDetails {
     @JsonIgnore
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return username;
     }
 
     // 账户是否未过期
     @JsonIgnore
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     // 账户是否未锁定
     @JsonIgnore
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     // 密码是否未过期
     @JsonIgnore
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

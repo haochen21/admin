@@ -6,9 +6,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import javax.persistence.EntityManager;
 import java.io.Serializable;
 
-public class ExtendedJpaRepository<T, ID extends Serializable>
-        extends SimpleJpaRepository<T, ID>
-        implements BaseRepository<T, ID> {
+public class ExtendedJpaRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements BaseRepository<T, ID> {
 
     private final EntityManager entityManager;
 
@@ -22,11 +20,11 @@ public class ExtendedJpaRepository<T, ID extends Serializable>
     }
 
     public <S extends T> S merge(S entity) {
-        return (S) this.entityManager.merge(entity);
+        return this.entityManager.merge(entity);
     }
 
     public <S extends T> S getReference(Class<S> domainClass, ID id) {
-        return (S) this.entityManager.getReference(domainClass, id);
+        return this.entityManager.getReference(domainClass, id);
     }
 }
 

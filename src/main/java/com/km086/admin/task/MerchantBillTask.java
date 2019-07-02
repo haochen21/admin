@@ -1,34 +1,147 @@
 package com.km086.admin.task;
 
-import com.km.admin.akka.actor.MerchantSupervisorActor.CreateMerchantBill;
-import com.km.admin.model.security.Merchant;
-import com.km.admin.service.SecurityService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.km086.admin.model.account.Bill;
+import com.km086.admin.model.account.BillStatus;
+import com.km086.admin.model.order.CartFilter;
+import com.km086.admin.model.security.Merchant;
+import com.km086.admin.service.AccountService;
+import com.km086.admin.service.MailService;
+import com.km086.admin.service.OrderService;
+import com.km086.admin.service.SecurityService;
+import com.km086.admin.wx.WxPayment;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
+@Slf4j
 @Component
 public class MerchantBillTask {
-    private static final Logger log = LoggerFactory.getLogger(MerchantBillTask.class);
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    @Value("${bill.delayDay}")
+    private int delayDay;
+
+    @Value("#{'${ticketMail.to}'.split(',')}")
+    String[] mailTos;
+
     @Autowired
     SecurityService securityService;
+
     @Autowired
-    ActorSystem actorSystem;
+    OrderService orderService;
+
+    @Autowired
+    AccountService accountService;
+
+    @Autowired
+    MailService mailService;
+
+    @Autowired
+    WxPayment wxPayment;
+
+    private static final int delaySecond = 60;
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Scheduled(cron = "${bill.cron}")
     public void bill() {
         log.info("bill starting......", dateFormat.format(new Date()));
         List<Merchant> merchants = this.securityService.findMerchantNeedPayment();
         log.info("payment merchant size is: " + merchants.size());
-        this.actorSystem.actorSelection("/user/supervisor/merchantSupervisor").tell(new MerchantSupervisorActor.CreateMerchantBill(merchants), ActorRef.noSender());
+    }
+
+    private void payBill(Merchant merchant) throws Exception {
+        log.info(merchant.getOpenId() + " begin stat bill");
+        List<Bill> transferBills = new ArrayList<>();
+
+        CartFilter filter = new CartFilter();
+        filter.setMerchant(merchant);
+        filter.setWeixinPaid(true);
+
+        LocalDateTime payTimeAfter = LocalDateTime.now();
+        payTimeAfter = payTimeAfter.minusDays(this.delayDay);
+        payTimeAfter = payTimeAfter.with(ChronoField.HOUR_OF_DAY, 0L);
+        payTimeAfter = payTimeAfter.with(ChronoField.MINUTE_OF_HOUR, 0L);
+        payTimeAfter = payTimeAfter.with(ChronoField.SECOND_OF_MINUTE, 0L);
+        payTimeAfter = payTimeAfter.with(ChronoField.MILLI_OF_SECOND, 0L);
+        ZonedDateTime payTimeAfterZdt = payTimeAfter.atZone(ZoneId.systemDefault());
+        filter.setPayTimeAfter(Date.from(payTimeAfterZdt.toInstant()));
+
+        LocalDateTime payTimeBefore = LocalDateTime.now();
+        payTimeBefore = payTimeBefore.minusDays(1L);
+        payTimeBefore = payTimeBefore.with(ChronoField.HOUR_OF_DAY, 23L);
+        payTimeBefore = payTimeBefore.with(ChronoField.MINUTE_OF_HOUR, 59L);
+        payTimeBefore = payTimeBefore.with(ChronoField.SECOND_OF_MINUTE, 59L);
+        payTimeBefore = payTimeBefore.with(ChronoField.MILLI_OF_SECOND, 999L);
+        ZonedDateTime payTimeBeforeZdt = payTimeBefore.atZone(ZoneId.systemDefault());
+        filter.setPayTimeBefore(Date.from(payTimeBeforeZdt.toInstant()));
+
+        List<Bill> bills = orderService.createBill(filter);
+        for (final Bill bill : bills) {
+            Bill dbBill = this.accountService.findBillByMerhcantAndDate(bill.getMerchant().getId(), bill.getStatDate());
+            if (dbBill == null) {
+                dbBill = this.accountService.saveBill(bill);
+                transferBills.add(dbBill);
+            } else {
+                if (dbBill.getStatus() != BillStatus.UNPAID) {
+                    continue;
+                }
+                transferBills.add(dbBill);
+            }
+        }
+        if (transferBills.size() > 0) {
+            for (Bill transferBill : transferBills) {
+                boolean payResult = this.wxPayment.payToMerchant(transferBill);
+                if (payResult) {
+                    transferBill.setStatus(BillStatus.PAID);
+                    this.accountService.updateBillStatus(transferBill.getId(), BillStatus.PAID);
+                }
+                Thread.sleep(delaySecond);
+            }
+        }
+    }
+
+    private void sendMail(List<Bill> bills) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("<table border=\"1\">");
+        sb.append("<thead><tr><th>商户名称</th><th>日期</th><th>销售金额</th><th>费率</th><th>手续费</th><th>实际转账</th><th>结果</th></tr></thead>");
+        sb.append("<tbody>");
+        for (final Bill bill : bills) {
+            sb.append("<tr");
+            if (bill.getStatus() == BillStatus.UNPAID) {
+                sb.append(" bgcolor=\"red\"");
+            }
+            sb.append(">");
+            sb.append("<td>").append(bill.getName()).append("</td>");
+            sb.append("<td>").append(dateFormat.format(bill.getStatDate())).append("</td>");
+            sb.append("<td>").append(this.round(bill.getTotalPrice())).append("</td>");
+            sb.append("<td>").append(bill.getRate()).append("</td>");
+            sb.append("<td>").append(this.round(bill.getServiceCharge())).append("</td>");
+            sb.append("<td>").append(this.round(bill.getPayment())).append("</td>");
+            sb.append("<td>").append(bill.getStatus().getDescription()).append("</td>");
+            sb.append("</tr>");
+        }
+        sb.append("</tbody>");
+        sb.append("</table>");
+        final String content = sb.toString();
+        for (final String mailTo : this.mailTos) {
+            this.mailService.sendSimpleMail(mailTo, dateFormat.format(new Date()) + " 商户账单", content);
+        }
+    }
+
+    private double round(BigDecimal value) {
+        return value.setScale(2, 4).doubleValue();
     }
 }
 

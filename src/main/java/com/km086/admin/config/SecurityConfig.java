@@ -1,12 +1,13 @@
 package com.km086.admin.config;
 
-import com.km086.admin.security.AppAuthenticationEntryPoint;
 import com.km086.admin.security.AppUserDetailsService;
+import com.km086.admin.security.JwtAuthenticationEntryPoint;
 import com.km086.admin.security.JwtAuthenticationTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,7 +25,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     AppUserDetailsService appUserDetailsService;
 
     @Autowired
-    private AppAuthenticationEntryPoint unauthorizedHandler;
+    JwtAuthenticationEntryPoint unauthorizedHandler;
+
+    @Autowired
+    JwtAuthenticationTokenFilter authenticationTokenFilter;
 
     @Autowired
     public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -42,8 +46,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JwtAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
-        return new JwtAuthenticationTokenFilter();
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
     @Override
@@ -75,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         // 添加JWT filter
         httpSecurity
-                .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 禁用缓存
         httpSecurity.headers().cacheControl();
