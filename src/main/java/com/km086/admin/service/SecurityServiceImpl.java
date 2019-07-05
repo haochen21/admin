@@ -146,7 +146,7 @@ public class SecurityServiceImpl implements SecurityService {
         dbMerchant.setRealName(merchant.getRealName());
         dbMerchant.setTransferOpenId(merchant.getTransferOpenId());
         if (merchant.getUser() != null) {
-            User user = (User) this.userRepository.findById(merchant.getUser().getId()).get();
+            User user = this.userRepository.findById(merchant.getUser().getId()).get();
             if (user != null) {
                 dbMerchant.setUser(user);
             } else {

@@ -9,6 +9,7 @@ import com.km086.admin.service.MailService;
 import com.km086.admin.service.OrderService;
 import com.km086.admin.service.SecurityService;
 import com.km086.admin.wx.WxPayment;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 
 @Slf4j
+@NoArgsConstructor
 @Component
 public class MerchantBillTask {
 
@@ -59,11 +61,38 @@ public class MerchantBillTask {
         log.info("bill starting......", dateFormat.format(new Date()));
         List<Merchant> merchants = this.securityService.findMerchantNeedPayment();
         log.info("payment merchant size is: " + merchants.size());
+
+        List<Bill> transferBills = new ArrayList<>();
+        for (Merchant merchant : merchants) {
+            try {
+                payBill(merchant, transferBills);
+            } catch (Exception ex) {
+                log.error("merchant create bill error!", ex);
+            }
+        }
+        try {
+            if (transferBills.size() > 0) {
+                for (Bill transferBill : transferBills) {
+                    boolean payResult = this.wxPayment.payToWx(transferBill.getNo(), transferBill.getOpenId(), transferBill.getPayment());
+                    if (payResult) {
+                        transferBill.setStatus(BillStatus.PAID);
+                        this.accountService.updateBillStatus(transferBill.getId(), BillStatus.PAID);
+                        log.info("merchant: {} pay bill: {} success ", transferBill.getMerchant().getId(), transferBill.getId());
+                    } else {
+                        log.info("merchant: {} pay bill: {} fail ", transferBill.getMerchant().getId(), transferBill.getId());
+                    }
+                    Thread.sleep(delaySecond);
+                }
+
+                sendMail(transferBills);
+            }
+        } catch (Exception ex) {
+            log.error("merchant bill error!", ex);
+        }
     }
 
-    private void payBill(Merchant merchant) throws Exception {
-        log.info(merchant.getOpenId() + " begin stat bill");
-        List<Bill> transferBills = new ArrayList<>();
+    private void payBill(Merchant merchant, List<Bill> transferBills) {
+        log.info("begin stat bill,merchant: {}", merchant.toString());
 
         CartFilter filter = new CartFilter();
         filter.setMerchant(merchant);
@@ -93,21 +122,10 @@ public class MerchantBillTask {
             if (dbBill == null) {
                 dbBill = this.accountService.saveBill(bill);
                 transferBills.add(dbBill);
-            } else {
-                if (dbBill.getStatus() != BillStatus.UNPAID) {
-                    continue;
-                }
+                log.info("add merchant: {} pay bill: {}", merchant.getId(), dbBill.getId());
+            } else if (dbBill.getStatus() == BillStatus.UNPAID) {
                 transferBills.add(dbBill);
-            }
-        }
-        if (transferBills.size() > 0) {
-            for (Bill transferBill : transferBills) {
-                boolean payResult = this.wxPayment.payToMerchant(transferBill);
-                if (payResult) {
-                    transferBill.setStatus(BillStatus.PAID);
-                    this.accountService.updateBillStatus(transferBill.getId(), BillStatus.PAID);
-                }
-                Thread.sleep(delaySecond);
+                log.info("add merchant: {} unpaid bill: {}", merchant.getId(), dbBill.getId());
             }
         }
     }

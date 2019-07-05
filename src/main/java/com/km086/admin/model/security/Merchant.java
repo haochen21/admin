@@ -25,8 +25,6 @@ public class Merchant implements Serializable {
     @NotNull
     @Column(name = "LOGINNAME", unique = true, nullable = false)
     @JsonSerialize(using = NameDecodeSerializer.class, as = String.class)
-    @EqualsAndHashCode.Include
-    @ToString.Include
     protected String loginName;
 
     @Column(name = "DEVICENO", unique = true)
@@ -40,6 +38,7 @@ public class Merchant implements Serializable {
     protected Boolean approved;
 
     @Column(name = "OPENID")
+    @ToString.Include
     protected String openId;
 
     @Column(name = "TRANSFEROPENID")

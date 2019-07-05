@@ -10,6 +10,7 @@ import com.km086.admin.service.AccountService;
 import com.km086.admin.service.MailService;
 import com.km086.admin.service.SecurityService;
 import com.km086.admin.wx.WxPayment;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,10 +24,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @Slf4j
+@NoArgsConstructor
 @Component
 public class AgentBillTask {
 
@@ -42,6 +45,8 @@ public class AgentBillTask {
     @Autowired
     MailService mailService;
 
+    private static final int delaySecond = 60;
+
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
@@ -54,10 +59,39 @@ public class AgentBillTask {
         userFilter.setProfile(Profile.AGENT);
         List<User> agents = this.securityService.findUserByFilter(userFilter, null);
         log.info("payment agent size is: " + agents.size());
+
+        List<AgentBill> transferBills = new ArrayList<>();
+        for (User agent : agents) {
+            try {
+                payBill(agent, transferBills);
+            } catch (Exception ex) {
+                log.error("agent create bill error!", ex);
+            }
+        }
+        try {
+            if (transferBills.size() > 0) {
+                for (AgentBill transferBill : transferBills) {
+                    boolean payResult = this.wxPayment.payToWx(transferBill.getNo(), transferBill.getOpenId(), transferBill.getEarning());
+                    if (payResult) {
+                        transferBill.setStatus(BillStatus.PAID);
+                        this.accountService.updateBillStatus(transferBill.getId(), BillStatus.PAID);
+                        log.info("agent: {} pay bill: {} success ", transferBill.getUser().getId(), transferBill.getId());
+                    } else {
+                        log.info("agent: {} pay bill: {} fail ", transferBill.getUser().getId(), transferBill.getId());
+                    }
+                    Thread.sleep(delaySecond);
+                }
+
+                sendMail(transferBills);
+            }
+        } catch (Exception ex) {
+            log.error("agent bill error!", ex);
+        }
     }
 
-    private void payBill(User agent) {
-        log.info(agent.getName() + " begin stat bill");
+    private void payBill(User agent, List<AgentBill> transferBills) {
+        log.info("begin stat bill,ageng: {}.", agent.getId());
+
         BillFilter billFilter = new BillFilter();
         billFilter.setUserId(agent.getId());
 
@@ -74,21 +108,19 @@ public class AgentBillTask {
         billFilter.setStatDateBefore(Date.from(endInstant));
 
         AgentBill agentBill = this.accountService.createAgentBill(billFilter, agent);
-
         if (agentBill != null) {
             AgentBill dbAgentBill = this.accountService.findAgentBillByAgentAndDate(agent.getId(), agentBill
                     .getStatBeginDate(), agentBill.getStatEndDate());
             if (dbAgentBill == null) {
                 dbAgentBill = this.accountService.saveAgentBill(agentBill);
-            }
-
-            if (dbAgentBill.getStatus() != BillStatus.PAID) {
-                boolean payResult = this.wxPayment.payToAgent(agentBill);
-                if (payResult) {
-                    this.accountService.updateAgentBillStatus(agentBill.getId(), BillStatus.PAID);
-                }
+                transferBills.add(dbAgentBill);
+                log.info("add agent: {} pay bill: {}.", agent.getId(), dbAgentBill.getId());
+            } else if (dbAgentBill.getStatus() == BillStatus.UNPAID) {
+                transferBills.add(dbAgentBill);
+                log.info("add agent: {} unpaid bill: {}.", agent.getId(), dbAgentBill.getId());
             }
         }
+
     }
 
     private void sendMail(List<AgentBill> bills) {

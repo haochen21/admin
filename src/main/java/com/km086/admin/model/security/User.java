@@ -52,9 +52,6 @@ public class User implements Serializable {
     @Column(name = "TRANSFEROPENID")
     protected String transferOpenId;
 
-    @OneToMany(mappedBy = "user")
-    protected Collection<Merchant> merchants = new ArrayList();
-
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "PROFILE", nullable = false)
@@ -72,6 +69,9 @@ public class User implements Serializable {
     @Transient
     @JsonSerialize
     private List<String> authorities;
+
+    @Transient
+    protected Collection<Merchant> merchants = new ArrayList();
 
     @Version
     protected long version;

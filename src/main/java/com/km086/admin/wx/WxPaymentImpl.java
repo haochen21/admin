@@ -1,11 +1,10 @@
 package com.km086.admin.wx;
 
 import com.github.binarywang.wxpay.bean.entpay.EntPayRequest;
+import com.github.binarywang.wxpay.bean.entpay.EntPayResult;
 import com.github.binarywang.wxpay.constant.WxPayConstants;
 import com.github.binarywang.wxpay.exception.WxPayException;
 import com.github.binarywang.wxpay.service.WxPayService;
-import com.km086.admin.model.account.AgentBill;
-import com.km086.admin.model.account.Bill;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
 
 
 @Slf4j
@@ -27,46 +25,30 @@ public class WxPaymentImpl implements WxPayment {
     @Autowired
     WxPayProperties wxPayProperties;
 
-    public boolean payToMerchant(Bill bill) {
+    @Override
+    public boolean payToWx(String billNo, String openId, BigDecimal payment) {
         try {
-            BigDecimal amount = bill.getPayment().setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
+            BigDecimal amount = payment.setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
             EntPayRequest request = EntPayRequest.newBuilder()
-                    .partnerTradeNo(bill.getNo())
-                    .openid(bill.getOpenId())
+                    .partnerTradeNo(billNo)
+                    .openid(openId)
                     .amount(amount.intValue())
                     .spbillCreateIp(wxPayProperties.getBillIp())
                     .checkName(WxPayConstants.CheckNameOption.NO_CHECK)
                     .description("转帐")
                     .build();
-
-            this.log.info(wxPayService.getEntPayService().entPay(request).toString());
-            return true;
-        }catch(WxPayException ex){
-            log.error("pay fail....",ex);
+            EntPayResult entPayResult = wxPayService.getEntPayService().entPay(request);
+            //log.info(entPayResult.toString());
+            if ("SUCCESS".equalsIgnoreCase(entPayResult.getResultCode())
+                    && "SUCCESS".equalsIgnoreCase(entPayResult.getReturnCode())) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (WxPayException ex) {
+            log.info("pay fail: {}", ex.getMessage());
+            return false;
         }
-        return false;
     }
-
-
-    public boolean payToAgent(AgentBill agentBill) {
-        try {
-            BigDecimal amount = agentBill.getEarning().setScale(2, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
-            EntPayRequest request = EntPayRequest.newBuilder()
-                    .partnerTradeNo(agentBill.getNo())
-                    .openid(agentBill.getOpenId())
-                    .amount(amount.intValue())
-                    .spbillCreateIp(wxPayProperties.getBillIp())
-                    .checkName(WxPayConstants.CheckNameOption.NO_CHECK)
-                    .description("转帐")
-                    .build();
-
-            this.log.info(wxPayService.getEntPayService().entPay(request).toString());
-            return true;
-        }catch(WxPayException ex){
-            log.error("pay fail....",ex);
-        }
-        return false;
-    }
-
 
 }
