@@ -62,7 +62,7 @@ public class MerchantController {
         return merchants;
     }
 
-    @RequestMapping(value = {"/merchant/id/{id}"}, method = {org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {"application/json"})
+    @RequestMapping(value = {"/merchant/{id}"}, method = {org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {"application/json"})
     public Merchant findMerchantById(@PathVariable Long id) {
         Merchant merchant = this.securityService.findMerchantWithUser(id);
         return merchant;
