@@ -1,0 +1,93 @@
+<div style="margin: 20px 0px">
+    <form nz-form [formGroup]="form" (ngSubmit)="submitForm()">
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzRequired nzFor="loginName">用户名</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="loginName" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzRequired nzFor="password">密码</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input type="password" id="password" formControlName="password"
+                    (ngModelChange)="updateConfirmValidator()" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzRequired nzFor="confirmPassword">密码确认</nz-form-label>
+            <nz-form-control [nzSpan]="8" [nzErrorTip]="errorTpl">
+                <input nz-input type="password" formControlName="checkPassword" id="checkPassword" />
+                <ng-template #errorTpl let-control>
+                    <ng-container *ngIf="control.hasError('required')">
+                        请确认密码!
+                    </ng-container>
+                    <ng-container *ngIf="control.hasError('confirm')">
+                        两个密码不匹配!
+                    </ng-container>
+                </ng-template>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzRequired nzFor="name">姓名</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="name" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzRequired nzFor="phone">手机</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="phone" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="email">邮箱</nz-form-label>
+            <nz-form-control [nzSpan]="12" nzHasFeedback [nzErrorTip]="emailErrorTpl">
+                <input nz-input formControlName="email" type="email" />
+                <ng-template #emailErrorTpl let-control>
+                    <ng-container *ngIf="control.hasError('email')">
+                        输入不是合法的E-mail!
+                    </ng-container>
+                    <ng-container *ngIf="control.hasError('required')">
+                        请输入E-mail!
+                    </ng-container>
+                </ng-template>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="rate">返点率</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="rate" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzRequired nzFor="openId">转帐openId</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="openId" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item nz-row class="register-area">
+            <nz-form-label [nzSpan]="4">角色</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <nz-select style="width: 120px;" [(ngModel)]="selectedRoleValue" [ngModelOptions]="{standalone: true}"
+                    name="role" nzAllowClear nzPlaceHolder="角色">
+                    <nz-option nzValue="0" nzLabel="管理员"></nz-option>
+                    <nz-option nzValue="1" nzLabel="代理商"></nz-option>
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item nz-row>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <button nz-button nzType="primary" [disabled]="!form.valid">确定</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>

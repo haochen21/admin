@@ -1,0 +1,87 @@
+<div class="modifyForm">
+    <form nz-form [formGroup]="form" (ngSubmit)="submit()">
+        <nz-form-item>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <label nz-checkbox formControlName="approved">管理员审核</label>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <label nz-checkbox formControlName="open">商铺是否开放</label>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <label nz-checkbox formControlName="takeOut">外卖</label>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="transferOpenId">转帐openId</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="transferOpenId" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="deviceNo">设备编号</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="deviceNo" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="printNo">小票机编号</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="printNo" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="discount">折扣</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="discount" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="autoPayment">自动转帐</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="autoPayment" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="rate">费率</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="rate" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="loginName">姓名</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="loginName" />
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <label nz-checkbox formControlName="takeByPhone">手机号码提货</label>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <label nz-checkbox formControlName="takeByPhoneSuffix">手机号码后四位提货</label>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4">代理商</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <nz-select nzShowSearch nzServerSearch nzAllowClear nzPlaceHolder="分配代理商" [nzShowArrow]="false"
+                    [nzFilterOption]="nzFilterOption" [(ngModel)]="selectedAgent" [ngModelOptions]="{standalone: true}"
+                    (nzOnSearch)="searchAgents($event)">
+                    <nz-option *ngFor="let agent of listOfAgents" [nzLabel]="agent.name" [nzValue]="agent"> </nz-option>
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item nz-row class="register-area">
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <button nz-button nzType="primary">确定</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>

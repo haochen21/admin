@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="row">
+    <ul nz-menu nzMode="horizontal" *ngIf="isLogin()">
+      <li nz-menu-item nzSelected>
+        <a [routerLink]="['merchants']">商家</a>
+      </li>
+      <li nz-menu-item>
+        <a [routerLink]="['bills']">转帐</a>
+      </li>
+      <li nz-menu-item>
+        <a [routerLink]="['agentBills']">收入</a>
+      </li>
+      <li nz-menu-item>
+        <a [routerLink]="['earning']">平台收入</a>
+      </li>
+      <li nz-submenu nzTitle="代理商">
+        <ul>
+          <li nz-menu-item>
+            <a [routerLink]="['agents']">查询</a>
+          </li>
+          <li nz-menu-item>
+            <a [routerLink]="['createAgent']">新建</a>
+          </li>
+        </ul>
+      </li>
+      <li nz-menu-item>
+        <a [routerLink]="['modifyPassword']">修改密码</a>
+      </li>
+    </ul>
+  </div>
+  <router-outlet></router-outlet>
+</div>

@@ -1,0 +1,127 @@
+<div class="row operate">
+    <button nz-button nzType="default" nzShape="circle" (click)="openQueryDataPanel()"><i nz-icon
+            nzType="search"></i></button>
+</div>
+<form nz-form [formGroup]="queryForm" (ngSubmit)="submitQueryForm()" *ngIf="queryPanelOpen">
+    <nz-form-item>
+        <nz-form-label [nzSpan]="4" nzFor="name">商铺名称</nz-form-label>
+        <nz-form-control [nzSpan]="8">
+            <input nz-input formControlName="name" id="name" />
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+        <nz-form-label [nzSpan]="4" nzFor="loginName">用户名</nz-form-label>
+        <nz-form-control [nzSpan]="8">
+            <input nz-input formControlName="loginName" id="loginName" />
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+        <nz-form-label [nzSpan]="4" nzFor="deviceNo">设备编号</nz-form-label>
+        <nz-form-control [nzSpan]="8">
+            <input nz-input formControlName="deviceNo" id="deviceNo" />
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+        <nz-form-label [nzSpan]="4" nzFor="openId">转帐openId</nz-form-label>
+        <nz-form-control [nzSpan]="8">
+            <input nz-input formControlName="openId" id="openId" />
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+        <nz-form-control [nzSpan]="8" [nzOffset]="4">
+            <label nz-checkbox formControlName="trash">回收站</label>
+        </nz-form-control>
+    </nz-form-item>
+    <nz-form-item nz-row class="register-area">
+        <nz-form-control [nzSpan]="8" [nzOffset]="4">
+            <button nz-button nzType="primary">确定</button>
+        </nz-form-control>
+    </nz-form-item>
+</form>
+<nz-table #merchantTable [nzData]="merchantsPage.content" [nzFrontPagination]="false"
+    [nzTotal]="merchantsPage.totalElements" [nzPageSize]="merchantsPage.numberOfElements" [nzPageIndex]="filter.page"
+    [nzScroll]="{ x: '1100px' }" (nzPageIndexChange)="pageChange($event)">
+    <thead>
+        <tr>
+            <th nzShowExpand></th>
+            <th nzWidth="100px" nzLeft="0px">用户名</th>
+            <th nzWidth="200px">商铺名称</th>
+            <th nzWidth="100px">营业状态</th>
+            <th nzWidth="100px">折扣率</th>
+            <th nzWidth="100px">自动转帐</th>
+            <th nzWidth="100px">费率</th>
+            <th nzWidth="300px" nzLeft="0px">操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-template ngFor let-data [ngForOf]="merchantTable.data">
+            <tr>
+                <td nzShowExpand [(nzExpand)]="mapOfExpandData[data.id]"></td>
+                <td>{{ data.loginName }}</td>
+                <td>{{ data.name }}</td>
+                <td>{{ data.open?'营业中':'暂时关闭' }}</td>
+                <td>{{ data.discount }}</td>
+                <td>{{ data.autoPayment? '自动转帐': '不转帐' }}</td>
+                <td>{{ data.rate }}</td>
+                <td>
+                    <a (click)="modifyMerchant(data.id)">修改</a>
+                    <nz-divider nzType="vertical"></nz-divider>
+                    <a (click)="order(data.id)">订单</a>
+                    <nz-divider nzType="vertical"></nz-divider>
+                    <a nzType="info" (click)="trashMerchant(data.id)">删除</a>
+                </td>
+            </tr>
+            <tr [nzExpand]="mapOfExpandData[data.id]">
+                <td></td>
+                <td colspan="5">
+                    <form>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">ID</label>
+                            <div class="col-sm-10">
+                                <input type="text" readonly class="form-control-plaintext" value="{{ data.id }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">手机</label>
+                            <div class="col-sm-10">
+                                <input type="text" readonly class="form-control-plaintext" value="{{ data.phone }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">邮箱</label>
+                            <div class="col-sm-10">
+                                <input type="text" readonly class="form-control-plaintext" value="{{ data.mail }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">设备编号</label>
+                            <div class="col-sm-10">
+                                <input type="text" readonly class="form-control-plaintext" value="{{ data.deviceNo }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">openID</label>
+                            <div class="col-sm-10">
+                                <input type="text" readonly class="form-control-plaintext" value="{{ data.openId }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">转帐openId</label>
+                            <div class="col-sm-10">
+                                <input type="text" readonly class="form-control-plaintext"
+                                    value="{{ data.transferOpenId }}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">代理商</label>
+                            <div class="col-sm-10">
+                                <input type="text" readonly class="form-control-plaintext"
+                                    value="{{ data.user != null? data.user.name: '' }}">
+                            </div>
+                        </div>
+                    </form>
+                </td>
+            </tr>
+        </ng-template>
+    </tbody>
+</nz-table>

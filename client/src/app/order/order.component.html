@@ -1,0 +1,90 @@
+<div style="margin: 20px 0px">
+    <form nz-form (ngSubmit)="submitQueryForm()">
+        <nz-form-item nz-row>
+            <nz-form-label [nzSpan]="4">日期</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <nz-range-picker [(ngModel)]="queryDateRange" [nzFormat]="dateFormat" name="queryDate">
+                </nz-range-picker>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item nz-row>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <button nz-button nzType="primary">确定</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>
+<nz-table #orderTable [nzData]="orderPage.content" [nzFrontPagination]="false" [nzTotal]="orderPage.totalElements"
+    [nzPageSize]="orderPage.numberOfElements" [nzPageIndex]="filter.page" [nzScroll]="{ x: '1100px' }"
+    (nzPageIndexChange)="pageChange($event)">
+    <thead>
+        <tr>
+            <th nzShowExpand></th>
+            <th nzWidth="100px" nzLeft="0px">订单编号</th>
+            <th nzWidth="200px">创建时间</th>
+            <th nzWidth="100px">订单状态</th>
+            <th nzWidth="200px">微信支付ID</th>
+            <th nzWidth="80px" nzLeft="0px">价格</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-template ngFor let-data [ngForOf]="orderTable.data">
+            <tr>
+                <td nzShowExpand [(nzExpand)]="mapOfExpandData[data.id]"></td>
+                <td>{{ data.no }}</td>
+                <td>{{ data.createdOn | amDateFormat:"YYYY-MM-DD HH:mm:ss" }}</td>
+                <td>{{ data.status | cartStatusFormatPipe }}</td>
+                <td>{{ data.transactionId }}</td>
+                <td>{{ data.totalPrice }}</td>
+            </tr>
+            <tr [nzExpand]="mapOfExpandData[data.id]">
+                <td></td>
+                <td colspan="5">
+                    <nz-tabset>
+                        <nz-tab nzTitle="订单信息">
+                            <table class="table">
+                                <tbody>
+                                    <tr *ngFor="let cartItem of data.cartItems">
+                                        <td>{{cartItem.name}}</td>
+                                        <td><i class="fas fa-yen-sign padding-right-5"></i>{{cartItem.unitPrice}}
+                                        </td>
+                                        <td>{{cartItem.quantity}}</td>
+                                        <td><i class="fas fa-yen-sign padding-right-5"></i>{{cartItem.totalPrice}}
+                                        </td>
+                                    </tr>
+                                    <tr class="dashed">
+                                        <td colspan="3"></td>
+                                        <td><i class="fas fa-yen-sign padding-right-5"></i>{{data.totalPrice}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </nz-tab>
+                        <nz-tab nzTitle="客户信息">
+                            <table class="table table-fixed">
+                                <tbody>
+                                    <tr>
+                                        <td class="width-30">姓名</td>
+                                        <td>{{data.customer.name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>卡号</td>
+                                        <td>{{data.customer.cardNo}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>手机</td>
+                                        <td>{{data.customer.phone}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>用户名</td>
+                                        <td>{{data.customer.loginName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </nz-tab>
+                    </nz-tabset>
+                </td>
+            </tr>
+        </ng-template>
+    </tbody>
+</nz-table>

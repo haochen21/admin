@@ -1,0 +1,21 @@
+<div style="margin: 20px 0px">
+    <form nz-form (ngSubmit)="submitQueryForm()">
+        <nz-form-item nz-row>
+            <nz-form-label [nzSpan]="4">日期</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <nz-range-picker [(ngModel)]="queryDateRange" [nzFormat]="dateFormat" name="queryDate">
+                </nz-range-picker>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item nz-row>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <button nz-button nzType="primary">确定</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>
+<nz-row>
+    <nz-col [nzSpan]="12" [nzOffset]="6">
+        <nz-statistic [nzValue]="earning" [nzTitle]="'收入统计'"></nz-statistic>
+    </nz-col>
+</nz-row>

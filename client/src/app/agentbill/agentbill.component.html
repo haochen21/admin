@@ -1,0 +1,49 @@
+<div style="margin: 20px 0px;">
+    <form nz-form (ngSubmit)="submitQueryForm()">
+        <nz-form-item nz-row>
+            <nz-form-label [nzSpan]="4">日期</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <nz-range-picker [(ngModel)]="queryDateRange" [nzFormat]="dateFormat" name="queryDate">
+                </nz-range-picker>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item nz-row>
+            <nz-form-label [nzSpan]="4">状态</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <nz-select style="width: 120px;" [(ngModel)]="selectedStatusValue" name="selectedStatus" nzAllowClear
+                    nzPlaceHolder="状态">
+                    <nz-option nzValue="1" nzLabel="成功"></nz-option>
+                    <nz-option nzValue="0" nzLabel="失败"></nz-option>
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item nz-row>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <button nz-button nzType="primary">确定</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>
+<nz-table #agentBillTable [nzData]="agentBillPage.content" [nzFrontPagination]="false"
+    [nzTotal]="agentBillPage.totalElements" [nzPageSize]="agentBillPage.numberOfElements" [nzPageIndex]="filter.page"
+    [nzScroll]="{ x: '900px' }" (nzPageIndexChange)="pageChange($event)">
+    <thead>
+        <tr>
+            <th nzWidth="80px" nzLeft="0px">开始日期</th>
+            <th nzWidth="80px">结束日期</th>
+            <th nzWidth="100px">代理商名称</th>
+            <th nzWidth="50px">费收入</th>
+            <th nzWidth="80px" nzLeft="0px">转账结果</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let data of agentBillTable.data">
+            <td>{{ data.statBeginDate }}</td>
+            <td>{{ data.statEndDate }}</td>
+            <td>{{ data.name }}</td>
+            <td>{{ data.earning }}</td>
+            <td [ngClass]="{'text-success': data.status ==billStatus.PAID, 'text-danger': data.status==billStatus.UNPAID }"
+                class="">{{ data.status | billStatusFormatPipe }}</td>
+        </tr>
+    </tbody>
+</nz-table>

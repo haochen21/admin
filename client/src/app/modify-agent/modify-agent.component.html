@@ -1,0 +1,30 @@
+<div style="margin: 20px 0px">
+    <form nz-form [formGroup]="form" (ngSubmit)="submit()">
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="name">姓名</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="name" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="phone">手机</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="phone" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label [nzSpan]="4" nzFor="mail">邮箱</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <input nz-input formControlName="mail" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item nz-row>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <button nz-button nzType="primary">确定</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>

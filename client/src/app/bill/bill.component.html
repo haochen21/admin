@@ -1,0 +1,43 @@
+<div style="margin: 20px 0px">
+    <form nz-form (ngSubmit)="submitQueryForm()">
+        <nz-form-item nz-row>
+            <nz-form-label [nzSpan]="4">日期</nz-form-label>
+            <nz-form-control [nzSpan]="8">
+                <nz-range-picker [(ngModel)]="queryDateRange" [nzFormat]="dateFormat" name="queryDate">
+                </nz-range-picker>
+            </nz-form-control>
+        </nz-form-item>
+        <nz-form-item nz-row>
+            <nz-form-control [nzSpan]="8" [nzOffset]="4">
+                <button nz-button nzType="primary">确定</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>
+<nz-table #billTable [nzData]="billPage.content" [nzFrontPagination]="false" [nzTotal]="billPage.totalElements"
+    [nzPageSize]="billPage.numberOfElements" [nzPageIndex]="filter.page" [nzScroll]="{ x: '1100px' }"
+    (nzPageIndexChange)="pageChange($event)">
+    <thead>
+        <tr>
+            <th nzWidth="100px" nzLeft="0px">日期</th>
+            <th nzWidth="120px">商户名称</th>
+            <th nzWidth="70px">销售金额</th>
+            <th nzWidth="50px">费率</th>
+            <th nzWidth="70px">手续费</th>
+            <th nzWidth="70px">实际转账</th>
+            <th nzWidth="80px" nzLeft="0px">转账结果</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let data of billTable.data">
+            <td>{{ data.statDate }}</td>
+            <td>{{ data.name }}</td>
+            <td>{{ data.totalPrice }}</td>
+            <td>{{ data.rate }}</td>
+            <td>{{ data.serviceCharge }}</td>
+            <td>{{ data.payment }}</td>
+            <td [ngClass]="{'text-success': data.status ==billStatus.PAID, 'text-danger': data.status==billStatus.UNPAID }"
+                class="">{{ data.status | billStatusFormatPipe }}</td>
+        </tr>
+    </tbody>
+</nz-table>
