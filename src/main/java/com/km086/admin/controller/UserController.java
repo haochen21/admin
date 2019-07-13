@@ -24,61 +24,54 @@ public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
-    @RequestMapping(value = {"/user/{id}"}, method = {org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {"application/json"})
+    @RequestMapping(value = {"/agent/{id}"}, method = RequestMethod.GET, produces = {"application/json"})
     public User findUserById(@PathVariable Long id) {
         User user = this.securityService.findUserById(id);
         return user;
     }
 
-    @RequestMapping(value = {"/user"}, method = {org.springframework.web.bind.annotation.RequestMethod.POST}, consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = {"/agent"}, method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
     public void createUser(@RequestBody User user) {
         log.info("register user: " + user.toString());
         this.securityService.saveUser(user);
     }
 
-    @RequestMapping(value = {"/user"}, method = {org.springframework.web.bind.annotation.RequestMethod.PUT}, consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = {"/agent"}, method = RequestMethod.PUT, consumes = {"application/json"}, produces = {"application/json"})
     public void modifyUser(@RequestBody User user) {
         log.info("modify user: " + user.toString());
         this.securityService.updateUser(user);
     }
 
-    @RequestMapping(value = {"/user/{id}"}, method = {org.springframework.web.bind.annotation.RequestMethod.DELETE})
+    @RequestMapping(value = {"/user/{id}"}, method = RequestMethod.DELETE)
     public void removeUser(@PathVariable Long id) {
         this.securityService.deleteUser(id);
     }
 
-    @RequestMapping(value = {"/user/loginNameExists/{loginName}"}, method = {org.springframework.web.bind.annotation.RequestMethod.GET})
+    @RequestMapping(value = {"/user/loginNameExists/{loginName}"}, method = RequestMethod.GET)
     @ResponseBody
     public Boolean existsByLoginName(@PathVariable String loginName) {
         return this.securityService.existsUserByLoginName(loginName);
     }
 
-    @RequestMapping(value = {"/user/page"}, method = {org.springframework.web.bind.annotation.RequestMethod.POST}, consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = {"/agent/page"}, method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
     public Page<User> pageUserByFilter(@RequestBody UserFilter filter) {
-        Page<User> page = this.securityService.pageUserByFilter(filter, PageRequest.of(filter.getPage(), filter.getSize()));
+        Page<User> page = this.securityService.pageUserByFilter(filter, PageRequest.of(filter.getPage()-1, filter.getSize()));
         return page;
     }
 
-    @RequestMapping(value = {"/user/list"}, method = {org.springframework.web.bind.annotation.RequestMethod.POST}, consumes = {"application/json"}, produces = {"application/json"})
-    public List<User> listUserByFilter(@RequestBody UserFilter filter) {
-        List<User> users = this.securityService.findUserByFilter(filter, PageRequest.of(filter
-                .getPage(), filter.getSize()));
-        return users;
-    }
-
-    @RequestMapping(value = {"/user/agent"}, method = {org.springframework.web.bind.annotation.RequestMethod.POST}, consumes = {"application/json"}, produces = {"application/json"})
+    @RequestMapping(value = {"/user/agent"}, method = RequestMethod.POST, consumes = {"application/json"}, produces = {"application/json"})
     public List<User> findAgent(@RequestBody UserFilter filter) {
         List<User> users = this.securityService.findUserByFilter(filter, null);
         return users;
     }
 
-    @RequestMapping(value = {"/user/password/{password}"}, method = {org.springframework.web.bind.annotation.RequestMethod.PUT})
+    @RequestMapping(value = {"/user/password/{password}"}, method = RequestMethod.PUT)
     public void modifyPassword(@PathVariable String password) {
         AppUser appUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         this.securityService.modifyUserPassword(appUser.getId(), password);
     }
 
-    @RequestMapping(value = {"/agent/name/{name}"}, method = {org.springframework.web.bind.annotation.RequestMethod.GET}, produces = {"application/json"})
+    @RequestMapping(value = {"/agent/name/{name}"}, method = RequestMethod.GET, produces = {"application/json"})
     public List<User> findAgentByName(@PathVariable String name) {
         UserFilter filter = new UserFilter();
         filter.setName(name);

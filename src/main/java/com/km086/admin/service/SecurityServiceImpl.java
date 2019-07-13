@@ -131,7 +131,7 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-    public void updateMerchant(Merchant merchant) {
+    public Merchant updateMerchant(Merchant merchant) {
         Merchant dbMerchant = this.merchantRepository.findById(merchant.getId()).get();
         dbMerchant.setApproved(merchant.getApproved());
         dbMerchant.setAutoPayment(merchant.getAutoPayment());
@@ -155,6 +155,7 @@ public class SecurityServiceImpl implements SecurityService {
         } else {
             dbMerchant.setUser(null);
         }
+        return this.merchantRepository.save(dbMerchant);
     }
 
     @Transactional(readOnly = false, propagation = Propagation.REQUIRED)

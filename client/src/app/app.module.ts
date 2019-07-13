@@ -66,8 +66,7 @@ registerLocaleData(zh);
   ],
   providers: [
     { provide: NZ_I18N, useValue: zh_CN },
-    { provide: HTTP_INTERCEPTORS, useClass: HttpIntercepterBasicAuthService, multi: true },
-    fakeBackendProvider
+    { provide: HTTP_INTERCEPTORS, useClass: HttpIntercepterBasicAuthService, multi: true }
   ],
   bootstrap: [AppComponent]
 })

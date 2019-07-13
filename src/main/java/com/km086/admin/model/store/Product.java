@@ -1,6 +1,6 @@
 package com.km086.admin.model.store;
 
-import com.km086.admin.model.security.Merchant;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "PRODUCT")
 public class Product implements Serializable {
 
@@ -34,11 +35,6 @@ public class Product implements Serializable {
     @Column(name = "DESCRIPTION")
     @Size(max = 255)
     protected String description;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MERCHANT_ID", nullable = false)
-    protected Merchant merchant;
 
     @Version
     protected long version;

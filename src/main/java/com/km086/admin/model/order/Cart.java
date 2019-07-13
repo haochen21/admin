@@ -69,7 +69,6 @@ public class Cart implements Serializable {
     protected String remark;
 
     @OneToMany(mappedBy = "cart")
-    @JsonManagedReference
     @ToString.Exclude
     protected Collection<CartItem> cartItems = new ArrayList();
 

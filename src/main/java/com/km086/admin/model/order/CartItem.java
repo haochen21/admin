@@ -1,6 +1,6 @@
 package com.km086.admin.model.order;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.km086.admin.model.store.Product;
 import lombok.*;
 
@@ -48,7 +48,7 @@ public class CartItem implements Serializable {
     @NotNull
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "CART_ID", nullable = false)
-    @JsonBackReference
+    @JsonIgnore
     @ToString.Exclude
     protected Cart cart;
 

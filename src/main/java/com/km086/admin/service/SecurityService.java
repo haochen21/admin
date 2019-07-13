@@ -32,8 +32,8 @@ public interface SecurityService {
   Merchant findMerchantById(Long paramLong);
   
   Merchant findMerchantWithUser(Long paramLong);
-  
-  void updateMerchant(Merchant paramMerchant);
+
+  Merchant updateMerchant(Merchant paramMerchant);
   
   void trashMerchant(Long paramLong);
   

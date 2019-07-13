@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 
 @RestController
 @RequestMapping({"/api"})
@@ -27,21 +26,11 @@ public class BillController {
     @RequestMapping(value = {"/bill/page"}, method = {org.springframework.web.bind.annotation.RequestMethod.POST}, consumes = {"application/json"}, produces = {"application/json"})
     public Page<Bill> pageBillByFilter(@RequestBody BillFilter filter) {
         AppUser appUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!appUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+        if (!appUser.getAuthorities().contains(new SimpleGrantedAuthority("ADMIN"))) {
             filter.setUserId(appUser.getId());
         }
-        Page<Bill> page = this.accountService.pageBillByFilter(filter, new PageRequest(filter.getPage(), filter.getSize()));
+        Page<Bill> page = this.accountService.pageBillByFilter(filter, PageRequest.of(filter.getPage() - 1, filter.getSize()));
         return page;
-    }
-
-    @RequestMapping(value = {"/bill/list"}, method = {org.springframework.web.bind.annotation.RequestMethod.POST}, consumes = {"application/json"}, produces = {"application/json"})
-    public List<Bill> listBillByFilter(@RequestBody BillFilter filter) {
-        AppUser securityUser = (AppUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!securityUser.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-            filter.setUserId(securityUser.getId());
-        }
-        List<Bill> bills = this.accountService.findBillByFilter(filter, new PageRequest(filter.getPage(), filter.getSize()));
-        return bills;
     }
 
     @RequestMapping(value = {"/bill/statTicketEarning"}, method = {org.springframework.web.bind.annotation.RequestMethod.POST}, consumes = {"application/json"})

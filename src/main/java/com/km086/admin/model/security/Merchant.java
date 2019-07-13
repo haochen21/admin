@@ -1,5 +1,6 @@
 package com.km086.admin.model.security;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
@@ -80,7 +81,7 @@ public class Merchant implements Serializable {
     @Column(name = "TAKEOUT")
     protected Boolean takeOut;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "USER_ID")
     protected User user;
 

@@ -38,7 +38,7 @@ public class AppUser implements UserDetails {
     //返回分配给用户的角色列表
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return authorities;
     }
 
     @JsonIgnore

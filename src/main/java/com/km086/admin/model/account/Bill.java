@@ -1,6 +1,7 @@
 package com.km086.admin.model.account;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.km086.admin.model.security.Merchant;
 import com.km086.admin.model.security.User;
 import lombok.EqualsAndHashCode;
@@ -87,10 +88,12 @@ public class Bill implements Serializable {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MERCHANT_ID", nullable = false)
+    @JsonIgnore
     protected Merchant merchant;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
+    @JsonIgnore
     protected User user;
 
     @Temporal(TemporalType.TIMESTAMP)
