@@ -15,7 +15,7 @@
     </form>
 </div>
 <nz-table #billTable [nzData]="billPage.content" [nzFrontPagination]="false" [nzTotal]="billPage.totalElements"
-    [nzPageSize]="billPage.numberOfElements" [nzPageIndex]="filter.page" [nzScroll]="{ x: '1100px' }"
+    [nzPageSize]="filter.size" [nzPageIndex]="filter.page" [nzScroll]="{ x: '1100px' }"
     (nzPageIndexChange)="pageChange($event)">
     <thead>
         <tr>

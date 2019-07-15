@@ -15,7 +15,7 @@
     </form>
 </div>
 <nz-table #orderTable [nzData]="orderPage.content" [nzFrontPagination]="false" [nzTotal]="orderPage.totalElements"
-    [nzPageSize]="orderPage.numberOfElements" [nzPageIndex]="filter.page" [nzScroll]="{ x: '1100px' }"
+    [nzPageSize]="filter.size" [nzPageIndex]="filter.page" [nzScroll]="{ x: '1100px' }"
     (nzPageIndexChange)="pageChange($event)">
     <thead>
         <tr>

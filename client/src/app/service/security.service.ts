@@ -26,6 +26,10 @@ export class SecurityService {
         return this.http.put<Merchant>('/api/merchant/' + merchant.id, merchant);
     }
 
+    trashMerchant(id: number): Observable<any> {
+        return this.http.put<any>('/api//merchant/trash/' + id, {});
+    }
+
     findAgents(filter: UserFilter): Observable<User[]> {
         return this.http.post<User[]>('/api/user/agent', filter);
     }
@@ -44,6 +48,10 @@ export class SecurityService {
 
     createAgent(agent: User): Observable<User> {
         return this.http.post<User>('/api/agent', agent);
+    }
+
+    deleteAgent(id: number): Observable<any> {
+        return this.http.delete<any>('/api/agent/' + id);
     }
 
     modifyPassword(password: string): Observable<any> {

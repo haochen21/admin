@@ -69,10 +69,11 @@ export class AgentComponent implements OnInit {
     this.trashAgentModal = this.modal.confirm({
       nzTitle: '代理商删除！',
       nzOnOk: () =>
-        new Promise((resolve, reject) => {
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-        }).catch(() => console.log('Oops errors!'))
+        this.securityService.deleteAgent(id).toPromise()
+          .then(value => {
+            this.agentPage.content = this.agentPage.content.filter(d => d.id !== id);
+          })
+          .catch(() => console.log('Oops errors!'))
     });
   }
-
 }

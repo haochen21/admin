@@ -41,7 +41,7 @@ export class ModifyPasswordComponent implements OnInit {
         agent => {
           console.log(agent);
           this.message.create('success', '修改密码成功');
-          this.router.navigate(['agents']);
+          this.router.navigate(['merchants']);
         },
         error => {
           console.log(error);

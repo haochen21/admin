@@ -42,7 +42,7 @@ public class UserController {
         this.securityService.updateUser(user);
     }
 
-    @RequestMapping(value = {"/user/{id}"}, method = RequestMethod.DELETE)
+    @RequestMapping(value = {"/agent/{id}"}, method = RequestMethod.DELETE)
     public void removeUser(@PathVariable Long id) {
         this.securityService.deleteUser(id);
     }

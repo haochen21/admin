@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
+import { JsonPipe } from '@angular/common';
 
 export const TOKEN = 'token'
 export const AUTHENTICATED_USER = 'authenticaterUser'
@@ -21,7 +22,11 @@ export class BasicAuthenticationService {
             }).pipe(
                 map(
                     data => {
-                        sessionStorage.setItem(AUTHENTICATED_USER, userName);
+                        let user = {
+                            userName: userName,
+                            isAdmin: data.admin
+                        };
+                        sessionStorage.setItem(AUTHENTICATED_USER, JSON.stringify(user));
                         sessionStorage.setItem(TOKEN, `Bearer ${data.token}`);
                         return data;
                     }
@@ -42,6 +47,15 @@ export class BasicAuthenticationService {
     isUserLoggedIn() {
         let user = sessionStorage.getItem(AUTHENTICATED_USER)
         return !(user === null)
+    }
+
+    isAdmin() {
+        let userStr = sessionStorage.getItem(AUTHENTICATED_USER);
+        if (userStr) {
+            let user = JSON.parse(userStr);
+            return user.isAdmin;
+        }
+        return false;
     }
 
     logout() {

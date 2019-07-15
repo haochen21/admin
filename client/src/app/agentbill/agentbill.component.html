@@ -25,7 +25,7 @@
     </form>
 </div>
 <nz-table #agentBillTable [nzData]="agentBillPage.content" [nzFrontPagination]="false"
-    [nzTotal]="agentBillPage.totalElements" [nzPageSize]="agentBillPage.numberOfElements" [nzPageIndex]="filter.page"
+    [nzTotal]="agentBillPage.totalElements" [nzPageSize]="filter.size" [nzPageIndex]="filter.page"
     [nzScroll]="{ x: '900px' }" (nzPageIndexChange)="pageChange($event)">
     <thead>
         <tr>

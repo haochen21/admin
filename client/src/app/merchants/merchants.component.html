@@ -39,7 +39,7 @@
     </nz-form-item>
 </form>
 <nz-table #merchantTable [nzData]="merchantsPage.content" [nzFrontPagination]="false"
-    [nzTotal]="merchantsPage.totalElements" [nzPageSize]="merchantsPage.numberOfElements" [nzPageIndex]="filter.page"
+    [nzTotal]="merchantsPage.totalElements" [nzPageSize]="filter.size" [nzPageIndex]="filter.page"
     [nzScroll]="{ x: '1100px' }" (nzPageIndexChange)="pageChange($event)">
     <thead>
         <tr>

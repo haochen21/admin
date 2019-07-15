@@ -13,7 +13,7 @@
       <li nz-menu-item>
         <a [routerLink]="['earning']">平台收入</a>
       </li>
-      <li nz-submenu nzTitle="代理商">
+      <li nz-submenu nzTitle="代理商" *ngIf="isAdmin()">
         <ul>
           <li nz-menu-item>
             <a [routerLink]="['agents']">查询</a>

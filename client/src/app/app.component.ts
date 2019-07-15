@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { BasicAuthenticationService } from './service/basic-authentication.service';
 
 @Component({
@@ -11,12 +10,15 @@ export class AppComponent {
   title = 'client';
 
   constructor(
-    private router: Router,
     private basicAuthenticationService: BasicAuthenticationService) { }
 
 
   isLogin() {
     return this.basicAuthenticationService.isUserLoggedIn();
+  }
+
+  isAdmin() {
+    return this.basicAuthenticationService.isAdmin();
   }
 
 }

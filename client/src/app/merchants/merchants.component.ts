@@ -85,7 +85,7 @@ export class MerchantsComponent implements OnInit {
     this.filter.deviceNo = this.queryForm.value.deviceNo;
     this.filter.openId = this.queryForm.value.openId;
     this.filter.trash = this.queryForm.value.trash;
-    this.filter.page = 0;
+    this.filter.page = 1;
     console.log(this.filter);
 
     this.query();
@@ -96,9 +96,11 @@ export class MerchantsComponent implements OnInit {
     this.trashMerchantModal = this.modal.confirm({
       nzTitle: '商家移动到回收站',
       nzOnOk: () =>
-        new Promise((resolve, reject) => {
-          setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-        }).catch(() => console.log('Oops errors!'))
+        this.securityService.trashMerchant(id).toPromise()
+          .then(value => {
+            this.merchantsPage.content = this.merchantsPage.content.filter(d => d.id !== id);
+          })
+          .catch(() => console.log('Oops errors!'))
     });
   }
 
