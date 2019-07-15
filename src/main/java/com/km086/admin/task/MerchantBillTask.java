@@ -83,9 +83,8 @@ public class MerchantBillTask {
                     }
                     Thread.sleep(delaySecond);
                 }
-
-                sendMail(transferBills);
             }
+            sendMail(transferBills);
         } catch (Exception ex) {
             log.error("merchant bill error!", ex);
         }
