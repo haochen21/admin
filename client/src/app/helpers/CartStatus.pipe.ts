@@ -4,7 +4,7 @@ import { CartStatus } from './../model/CartStatus';
 @Pipe({ name: 'cartStatusFormatPipe' })
 export class CartStatusFormatPipe implements PipeTransform {
 
-    transform(value: CartStatus, args: string[]): any {
+    transform(value: CartStatus): any {
         if (value === CartStatus.CONFIRMED) {
             return "订单确认";
         } else if (value === CartStatus.DELIVERED) {

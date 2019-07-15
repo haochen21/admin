@@ -23,7 +23,7 @@ import { ModifyMerchantComponent } from './modify-merchant/modify-merchant.compo
 import { OrderComponent } from './order/order.component';
 import { AgentComponent } from './agent/agent.component';
 
-import { AgentProfileFormatPipe } from './helpers/AgentProfile.Pipe'
+import { AgentProfileFormatPipe } from './helpers/AgentProfile.pipe'
 import { BillStatusFormatPipe } from './helpers/BillStatus.pipe';
 import { CartStatusFormatPipe } from './helpers/CartStatus.pipe';
 import { BillComponent } from './bill/bill.component';

@@ -4,7 +4,7 @@ import { BillStatus } from '../model/BillStatus';
 @Pipe({ name: 'billStatusFormatPipe' })
 export class BillStatusFormatPipe implements PipeTransform {
 
-    transform(value: BillStatus, args: string[]): any {
+    transform(value: BillStatus): any {
         if (value === BillStatus.UNPAID) {
             return "成功";
         } else if (value === BillStatus.PAID) {
